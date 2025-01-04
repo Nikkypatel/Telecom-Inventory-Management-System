@@ -1,0 +1,48 @@
+database:inventory
+tables
+Users
+create table users (
+   uid int auto_increment primary key,
+   userName varchar(50) not null unique,
+   firstName varchar(50) not null,
+   lastName varchar(50) not null,
+   password varchar(100) not null,
+   email varchar(100) not null unique,
+   role enum('Admin','Manager','Staff'),
+   phone_no varchar(15)
+);
+
+-- Products
+create table products (
+   pid int auto_increment primary key,
+   pname varchar(100) not null,
+   description text,
+   category varchar(50),
+   model_no varchar(50),
+   serial_no varchar(255) unique,
+   stock_level int,
+   reorder_point int
+);
+
+-- Suppliers
+create table suppliers (
+   sid int auto_increment primary key,
+   sname varchar(50) not null,
+   semail varchar(100) not null unique,
+   sphone_no varchar(15),
+   order_date date,
+   quantity int not null,
+   status enum('Delivered','InProgress','Shipped')
+);
+
+-- Transactions
+create table transactions (
+   tid int auto_increment primary key,
+   pid int not null,
+   uid int not null,
+   quantity int not null,
+   type enum('stock-in','stock-out') not null,
+   timestamp timestamp null default current_timestamp,
+   foreign key (pid) references products(pid) on delete cascade,
+   foreign key (uid) references users(uid) on delete cascade
+);

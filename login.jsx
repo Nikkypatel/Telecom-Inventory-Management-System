@@ -1,6 +1,6 @@
-// src/components/Login.jsx
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import axios from 'axios'; // You need axios for API calls
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -8,20 +8,35 @@ const Login = () => {
   const [error, setError] = useState('');
   const history = useHistory();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    // Mock authentication (Replace with your actual API logic)
-    if (email === 'admin@example.com' && password === 'admin') {
-      localStorage.setItem('user', JSON.stringify({ email, role: 'admin' }));
-      history.push('/dashboard');
-    } else if (email === 'manager@example.com' && password === 'manager') {
-      localStorage.setItem('user', JSON.stringify({ email, role: 'manager' }));
-      history.push('/dashboard');
-    } else if (email === 'staff@example.com' && password === 'staff') {
-      localStorage.setItem('user', JSON.stringify({ email, role: 'staff' }));
-      history.push('/dashboard');
-    } else {
+    try {
+      // Send login request to the backend
+      const response = await axios.post('http://localhost:5000/login', {
+        username: email,  // Replace with your field name from API
+        password,
+      });
+
+      // On successful login, the server should return a JWT token
+      const token = response.data.token;
+
+      if (token) {
+        // Store the JWT token in localStorage
+        localStorage.setItem('jwt_token', token);
+
+        // Optionally store user info for later use (like in the dashboard)
+        const user = {
+          email,
+          role: response.data.role, // Assuming the response includes the user's role
+        };
+        localStorage.setItem('user', JSON.stringify(user));
+
+        // Redirect to the dashboard or another protected route
+        history.push('/dashboard');
+      }
+    } catch (err) {
+      // If there is an error (e.g., invalid credentials), show an error message
       setError('Invalid credentials');
     }
   };

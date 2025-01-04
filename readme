@@ -23,3 +23,17 @@ Backend Using Flask:
 backend/ (Flask)
 │   ├── app.py
 │   
+FrontEnd :
+my-app/
+├── public/
+│   └── index.html         
+├── src/
+│   ├── components/        
+│   │   ├── Navbar.jsx    
+│   │   ├── Login.jsx     
+│   │   └── Dashboard.jsx   
+│   ├── App.jsx            
+│   ├── index.jsx          
+│   └── index.css          
+├── package.json           
+└── README.md    

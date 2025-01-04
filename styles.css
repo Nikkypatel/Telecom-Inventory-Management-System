@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Telecom Inventory Management</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Telecom Inventory Management System</h1>
+        <nav>
+            <ul>
+                <li><a href="home.html">Home</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <section>
+            <h2>Welcome to Telecom Inventory Management!</h2>
+            <p>Your one-stop solution for managing telecom products, suppliers, and stock levels.</p>
+            <a href="login.html" class="btn">Login to Dashboard</a>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Telecom Technologies. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>

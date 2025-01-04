@@ -5,6 +5,7 @@ from mysql.connector import pooling
 import bcrypt
 import jwt
 import datetime
+from functools import wraps
 
 # Initialize app and middleware
 app = Flask(__name__)
@@ -26,13 +27,38 @@ connection_pool = pooling.MySQLConnectionPool(pool_name="mypool", pool_size=5, *
 
 # Utility function to query the database
 def query(sql, params=None):
-    connection = connection_pool.get_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute(sql, params)
-    result = cursor.fetchall()
-    cursor.close()
-    connection.close()
-    return result
+    try:
+        connection = connection_pool.get_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute(sql, params)
+        result = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        return result
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        raise
+
+# Token required decorator
+def token_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = None
+        if 'Authorization' in request.headers:
+            token = request.headers['Authorization'].split(' ')[1]
+        if not token:
+            return jsonify({'error': 'Token is missing'}), 403
+
+        try:
+            data = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+            current_user = data['id']
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token has expired'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Invalid token'}), 403
+
+        return f(current_user, *args, **kwargs)
+    return decorated_function
 
 # Routes
 
@@ -75,7 +101,8 @@ def login():
 
 # Product routes
 @app.route('/products', methods=['GET'])
-def get_products():
+@token_required
+def get_products(current_user):
     try:
         products = query('SELECT * FROM products')
         return jsonify(products)
@@ -83,7 +110,8 @@ def get_products():
         return jsonify({'error': 'Error fetching products'}), 500
 
 @app.route('/products', methods=['POST'])
-def add_product():
+@token_required
+def add_product(current_user):
     data = request.get_json()
     name = data['name']
     category = data['category']
